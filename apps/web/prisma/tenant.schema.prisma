@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/tenant-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("PRISMA_TENANT_DATABASE_URL")
+}
+
+model WorkflowDefinition {
+  id          String         @id @db.VarChar(64)
+  name        String         @db.VarChar(128)
+  description String
+  createdBy   String         @map("created_by") @db.VarChar(64)
+  nodes       WorkflowNode[]
+  edges       WorkflowEdge[]
+
+  @@map("workflow_definitions")
+}
+
+model WorkflowNode {
+  id         Int                @id @default(autoincrement())
+  workflowId String             @map("workflow_id") @db.VarChar(64)
+  nodeId     String             @map("node_id") @db.VarChar(64)
+  name       String             @db.VarChar(128)
+  kind       String             @db.VarChar(64)
+  config     Json
+  workflow   WorkflowDefinition @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([workflowId])
+  @@map("workflow_nodes")
+}
+
+model WorkflowEdge {
+  id         Int                @id @default(autoincrement())
+  workflowId String             @map("workflow_id") @db.VarChar(64)
+  source     String             @db.VarChar(64)
+  target     String             @db.VarChar(64)
+  workflow   WorkflowDefinition @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([workflowId])
+  @@map("workflow_edges")
+}

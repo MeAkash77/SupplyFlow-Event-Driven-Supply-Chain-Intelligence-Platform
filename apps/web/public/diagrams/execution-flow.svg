@@ -1,0 +1,67 @@
+<svg width="1200" height="720" viewBox="0 0 1200 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="720" rx="32" fill="#07111D"/>
+  <rect x="24" y="24" width="1152" height="672" rx="28" stroke="#1C3147"/>
+  <text x="56" y="80" fill="#EEF4FB" font-size="34" font-family="Inter, Arial, sans-serif" font-weight="700">Workflow Execution Flow</text>
+  <text x="56" y="114" fill="#86A3BD" font-size="16" font-family="Inter, Arial, sans-serif">From business process edit to async execution, connector calls, and completion events.</text>
+
+  <rect x="64" y="210" width="140" height="90" rx="18" fill="#0D1B2A" stroke="#20425E"/>
+  <text x="90" y="247" fill="#59E1D9" font-size="14" font-family="Inter, Arial, sans-serif" letter-spacing="2">ACTOR</text>
+  <text x="90" y="280" fill="#EEF4FB" font-size="22" font-family="Inter, Arial, sans-serif" font-weight="600">Tenant Admin</text>
+
+  <rect x="246" y="170" width="150" height="130" rx="18" fill="#0D1B2A" stroke="#20425E"/>
+  <text x="272" y="207" fill="#59E1D9" font-size="14" font-family="Inter, Arial, sans-serif" letter-spacing="2">WEB</text>
+  <text x="272" y="240" fill="#EEF4FB" font-size="22" font-family="Inter, Arial, sans-serif" font-weight="600">Canvas</text>
+  <text x="272" y="270" fill="#B5C7D8" font-size="16" font-family="Inter, Arial, sans-serif">Edit process</text>
+
+  <rect x="438" y="150" width="170" height="150" rx="18" fill="#0D1B2A" stroke="#20425E"/>
+  <text x="464" y="187" fill="#59E1D9" font-size="14" font-family="Inter, Arial, sans-serif" letter-spacing="2">API</text>
+  <text x="464" y="220" fill="#EEF4FB" font-size="22" font-family="Inter, Arial, sans-serif" font-weight="600">FastAPI</text>
+  <text x="464" y="250" fill="#B5C7D8" font-size="16" font-family="Inter, Arial, sans-serif">Validate access</text>
+  <text x="464" y="274" fill="#B5C7D8" font-size="16" font-family="Inter, Arial, sans-serif">Load workflow</text>
+
+  <rect x="650" y="170" width="160" height="110" rx="18" fill="#0D1B2A" stroke="#20425E"/>
+  <text x="676" y="207" fill="#FF9A5A" font-size="14" font-family="Inter, Arial, sans-serif" letter-spacing="2">QUEUE</text>
+  <text x="676" y="240" fill="#EEF4FB" font-size="22" font-family="Inter, Arial, sans-serif" font-weight="600">RabbitMQ</text>
+  <text x="676" y="268" fill="#B5C7D8" font-size="16" font-family="Inter, Arial, sans-serif">Event publish</text>
+
+  <rect x="854" y="150" width="170" height="150" rx="18" fill="#0D1B2A" stroke="#20425E"/>
+  <text x="880" y="187" fill="#FF9A5A" font-size="14" font-family="Inter, Arial, sans-serif" letter-spacing="2">RUNTIME</text>
+  <text x="880" y="220" fill="#EEF4FB" font-size="22" font-family="Inter, Arial, sans-serif" font-weight="600">Worker</text>
+  <text x="880" y="250" fill="#B5C7D8" font-size="16" font-family="Inter, Arial, sans-serif">Consume message</text>
+  <text x="880" y="274" fill="#B5C7D8" font-size="16" font-family="Inter, Arial, sans-serif">Retry / DLQ</text>
+
+  <rect x="438" y="430" width="170" height="150" rx="18" fill="#0D1B2A" stroke="#20425E"/>
+  <text x="464" y="467" fill="#82D949" font-size="14" font-family="Inter, Arial, sans-serif" letter-spacing="2">ENGINE</text>
+  <text x="464" y="500" fill="#EEF4FB" font-size="22" font-family="Inter, Arial, sans-serif" font-weight="600">Workflow Engine</text>
+  <text x="464" y="530" fill="#B5C7D8" font-size="16" font-family="Inter, Arial, sans-serif">Validate graph</text>
+  <text x="464" y="554" fill="#B5C7D8" font-size="16" font-family="Inter, Arial, sans-serif">Generate timeline</text>
+
+  <rect x="650" y="450" width="160" height="110" rx="18" fill="#0D1B2A" stroke="#20425E"/>
+  <text x="676" y="487" fill="#82D949" font-size="14" font-family="Inter, Arial, sans-serif" letter-spacing="2">SDK</text>
+  <text x="676" y="520" fill="#EEF4FB" font-size="22" font-family="Inter, Arial, sans-serif" font-weight="600">Connectors</text>
+  <text x="676" y="548" fill="#B5C7D8" font-size="16" font-family="Inter, Arial, sans-serif">ERP / WMS calls</text>
+
+  <rect x="854" y="430" width="200" height="150" rx="18" fill="#0D1B2A" stroke="#20425E"/>
+  <text x="880" y="467" fill="#82D949" font-size="14" font-family="Inter, Arial, sans-serif" letter-spacing="2">OUTCOME</text>
+  <text x="880" y="500" fill="#EEF4FB" font-size="22" font-family="Inter, Arial, sans-serif" font-weight="600">Completion Event</text>
+  <text x="880" y="530" fill="#B5C7D8" font-size="16" font-family="Inter, Arial, sans-serif">Metrics, alerts, status</text>
+  <text x="880" y="554" fill="#B5C7D8" font-size="16" font-family="Inter, Arial, sans-serif">UI becomes observable</text>
+
+  <path d="M204 255H246" stroke="#59E1D9" stroke-width="3" stroke-linecap="round"/>
+  <path d="M396 235H438" stroke="#59E1D9" stroke-width="3" stroke-linecap="round"/>
+  <path d="M608 225H650" stroke="#FF9A5A" stroke-width="3" stroke-linecap="round"/>
+  <path d="M810 225H854" stroke="#FF9A5A" stroke-width="3" stroke-linecap="round"/>
+  <path d="M939 300V350" stroke="#FF9A5A" stroke-width="3" stroke-dasharray="8 8" stroke-linecap="round"/>
+  <path d="M939 350H523" stroke="#82D949" stroke-width="3" stroke-dasharray="8 8" stroke-linecap="round"/>
+  <path d="M523 350V430" stroke="#82D949" stroke-width="3" stroke-dasharray="8 8" stroke-linecap="round"/>
+  <path d="M608 505H650" stroke="#82D949" stroke-width="3" stroke-linecap="round"/>
+  <path d="M810 505H854" stroke="#82D949" stroke-width="3" stroke-linecap="round"/>
+
+  <circle cx="246" cy="255" r="5" fill="#59E1D9"/>
+  <circle cx="438" cy="235" r="5" fill="#59E1D9"/>
+  <circle cx="650" cy="225" r="5" fill="#FF9A5A"/>
+  <circle cx="854" cy="225" r="5" fill="#FF9A5A"/>
+  <circle cx="523" cy="430" r="5" fill="#82D949"/>
+  <circle cx="650" cy="505" r="5" fill="#82D949"/>
+  <circle cx="854" cy="505" r="5" fill="#82D949"/>
+</svg>

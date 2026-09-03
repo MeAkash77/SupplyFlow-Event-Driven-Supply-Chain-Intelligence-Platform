@@ -1,0 +1,95 @@
+{
+  "name": "Oracle ERP Cloud → EasyFlow",
+  "description": "Fetches purchase orders and inventory from Oracle ERP Cloud REST APIs and forwards to EasyFlow. Runs every 10 minutes.",
+  "tags": ["easyflow", "oracle", "erp", "supply-chain"],
+  "nodes": [
+    {
+      "id": "trigger",
+      "name": "Every 10 minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "rule": { "interval": [{ "field": "minutes", "minutesInterval": 10 }] }
+      },
+      "position": [100, 300]
+    },
+    {
+      "id": "oracle_fetch",
+      "name": "Fetch Oracle Purchase Orders",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.ORACLE_BASE_URL }}/fscmRestApi/resources/11.13.18.05/purchaseOrders",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "basicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Accept", "value": "application/json" }
+          ]
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "limit", "value": "100" },
+            { "name": "fields", "value": "PONumber,Supplier,OrderedQuantity,CurrencyCode,Status,OrderDate" }
+          ]
+        }
+      },
+      "position": [350, 300]
+    },
+    {
+      "id": "transform",
+      "name": "Normalise to EasyFlow format",
+      "type": "n8n-nodes-base.set",
+      "parameters": {
+        "mode": "manual",
+        "fields": {
+          "values": [
+            { "name": "event_type",             "value": "purchase_order_created" },
+            { "name": "source",                 "value": "oracle" },
+            { "name": "tenant_id",              "value": "={{ $env.EASYFLOW_TENANT_ID }}" },
+            { "name": "data.purchase_order_id", "value": "={{ $json.PONumber }}" },
+            { "name": "data.supplier_name",     "value": "={{ $json.Supplier }}" },
+            { "name": "data.quantity",          "value": "={{ $json.OrderedQuantity }}" },
+            { "name": "data.currency",          "value": "={{ $json.CurrencyCode }}" },
+            { "name": "data.status",            "value": "={{ $json.Status }}" },
+            { "name": "data.created_date",      "value": "={{ $json.OrderDate }}" }
+          ]
+        }
+      },
+      "position": [600, 300]
+    },
+    {
+      "id": "send_to_easyflow",
+      "name": "POST to EasyFlow Webhook",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.EASYFLOW_API_URL }}/api/webhooks/inbound/{{ $env.EASYFLOW_TENANT_ID }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type",    "value": "application/json" },
+            { "name": "X-Source",        "value": "oracle" },
+            { "name": "X-Webhook-Token", "value": "={{ $env.EASYFLOW_WEBHOOK_TOKEN }}" }
+          ]
+        },
+        "sendBody": true,
+        "bodyContentType": "json",
+        "body": "={{ JSON.stringify($json) }}"
+      },
+      "position": [850, 300]
+    }
+  ],
+  "connections": {
+    "trigger":      { "main": [[{ "node": "oracle_fetch",      "type": "main", "index": 0 }]] },
+    "oracle_fetch": { "main": [[{ "node": "transform",         "type": "main", "index": 0 }]] },
+    "transform":    { "main": [[{ "node": "send_to_easyflow",  "type": "main", "index": 0 }]] }
+  },
+  "env_vars_needed": {
+    "ORACLE_BASE_URL":          "https://your-oracle-instance.oraclecloud.com",
+    "EASYFLOW_API_URL":         "http://localhost:8000",
+    "EASYFLOW_TENANT_ID":       "your-tenant-slug",
+    "EASYFLOW_WEBHOOK_TOKEN":   "get-from-easyflow-integrations-page"
+  }
+}

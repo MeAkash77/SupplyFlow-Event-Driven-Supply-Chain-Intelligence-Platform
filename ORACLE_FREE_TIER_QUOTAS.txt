@@ -1,0 +1,15 @@
+set compute-core quota standard-a1-core-count to 4 in compartment easyflow-demo
+set compute-core quota standard-a1-memory-count to 24 in compartment easyflow-demo
+set block-storage quota total-storage-gb to 50 in compartment easyflow-demo
+
+zero virtual-network-family quotas in compartment easyflow-demo where request.operation = 'CreateNatGateway'
+zero virtual-network-family quotas in compartment easyflow-demo where request.operation = 'CreateServiceGateway'
+zero virtual-network-family quotas in compartment easyflow-demo where request.operation = 'CreateLocalPeeringGateway'
+zero virtual-network-family quotas in compartment easyflow-demo where request.operation = 'CreateRemotePeeringConnection'
+
+zero load-balancers quotas in compartment easyflow-demo
+zero database quotas in compartment easyflow-demo
+zero autonomous-database quotas in compartment easyflow-demo
+zero mysql quotas in compartment easyflow-demo
+zero golden-gate quotas in compartment easyflow-demo
+zero oke quotas in compartment easyflow-demo

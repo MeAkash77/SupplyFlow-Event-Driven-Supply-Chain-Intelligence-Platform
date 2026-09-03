@@ -1,0 +1,11 @@
+{
+  "name": "easyflow",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/web"
+  ],
+  "scripts": {
+    "test:engine": "python3 -m unittest discover -s tests"
+  }
+}

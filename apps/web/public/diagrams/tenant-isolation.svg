@@ -1,0 +1,48 @@
+<svg width="1200" height="720" viewBox="0 0 1200 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="720" rx="32" fill="#07111D"/>
+  <rect x="24" y="24" width="1152" height="672" rx="28" stroke="#1C3147"/>
+  <text x="56" y="80" fill="#EEF4FB" font-size="34" font-family="Inter, Arial, sans-serif" font-weight="700">Tenant Isolation Model</text>
+  <text x="56" y="114" fill="#86A3BD" font-size="16" font-family="Inter, Arial, sans-serif">Tenant admins stay inside their own workspace. Superadmin is the only cross-tenant operator.</text>
+
+  <rect x="480" y="150" width="240" height="110" rx="22" fill="#0D1B2A" stroke="#20425E"/>
+  <text x="508" y="186" fill="#59E1D9" font-size="14" font-family="Inter, Arial, sans-serif" letter-spacing="2">PLATFORM</text>
+  <text x="508" y="222" fill="#EEF4FB" font-size="24" font-family="Inter, Arial, sans-serif" font-weight="600">Superadmin</text>
+  <text x="508" y="250" fill="#B5C7D8" font-size="16" font-family="Inter, Arial, sans-serif">Cross-tenant control</text>
+
+  <rect x="110" y="320" width="400" height="270" rx="26" fill="#0D1B2A" stroke="#20425E"/>
+  <text x="138" y="360" fill="#82D949" font-size="14" font-family="Inter, Arial, sans-serif" letter-spacing="2">TENANT A</text>
+  <rect x="138" y="390" width="150" height="80" rx="16" fill="#12263A" stroke="#284C69"/>
+  <text x="158" y="425" fill="#EEF4FB" font-size="20" font-family="Inter, Arial, sans-serif" font-weight="600">Tenant Admin A</text>
+  <text x="158" y="448" fill="#B5C7D8" font-size="14" font-family="Inter, Arial, sans-serif">Own tenant only</text>
+  <rect x="314" y="390" width="168" height="80" rx="16" fill="#12263A" stroke="#284C69"/>
+  <text x="336" y="425" fill="#EEF4FB" font-size="20" font-family="Inter, Arial, sans-serif" font-weight="600">Process Graph A</text>
+  <text x="336" y="448" fill="#B5C7D8" font-size="14" font-family="Inter, Arial, sans-serif">Nodes and transitions</text>
+  <rect x="138" y="492" width="150" height="72" rx="16" fill="#12263A" stroke="#284C69"/>
+  <text x="166" y="533" fill="#EEF4FB" font-size="18" font-family="Inter, Arial, sans-serif" font-weight="600">Users A</text>
+  <rect x="314" y="492" width="168" height="72" rx="16" fill="#12263A" stroke="#284C69"/>
+  <text x="336" y="525" fill="#EEF4FB" font-size="18" font-family="Inter, Arial, sans-serif" font-weight="600">Connectors A</text>
+  <text x="336" y="546" fill="#B5C7D8" font-size="14" font-family="Inter, Arial, sans-serif">ERP, WMS, alerts</text>
+
+  <rect x="690" y="320" width="400" height="270" rx="26" fill="#0D1B2A" stroke="#20425E"/>
+  <text x="718" y="360" fill="#FF9A5A" font-size="14" font-family="Inter, Arial, sans-serif" letter-spacing="2">TENANT B</text>
+  <rect x="718" y="390" width="150" height="80" rx="16" fill="#12263A" stroke="#284C69"/>
+  <text x="738" y="425" fill="#EEF4FB" font-size="20" font-family="Inter, Arial, sans-serif" font-weight="600">Tenant Admin B</text>
+  <text x="738" y="448" fill="#B5C7D8" font-size="14" font-family="Inter, Arial, sans-serif">Own tenant only</text>
+  <rect x="894" y="390" width="168" height="80" rx="16" fill="#12263A" stroke="#284C69"/>
+  <text x="916" y="425" fill="#EEF4FB" font-size="20" font-family="Inter, Arial, sans-serif" font-weight="600">Process Graph B</text>
+  <text x="916" y="448" fill="#B5C7D8" font-size="14" font-family="Inter, Arial, sans-serif">Nodes and transitions</text>
+  <rect x="718" y="492" width="150" height="72" rx="16" fill="#12263A" stroke="#284C69"/>
+  <text x="746" y="533" fill="#EEF4FB" font-size="18" font-family="Inter, Arial, sans-serif" font-weight="600">Users B</text>
+  <rect x="894" y="492" width="168" height="72" rx="16" fill="#12263A" stroke="#284C69"/>
+  <text x="916" y="525" fill="#EEF4FB" font-size="18" font-family="Inter, Arial, sans-serif" font-weight="600">Connectors B</text>
+  <text x="916" y="546" fill="#B5C7D8" font-size="14" font-family="Inter, Arial, sans-serif">ERP, WMS, alerts</text>
+
+  <path d="M600 260V320" stroke="#59E1D9" stroke-width="3" stroke-linecap="round"/>
+  <path d="M600 320H310" stroke="#59E1D9" stroke-width="3" stroke-linecap="round"/>
+  <path d="M600 320H890" stroke="#FF9A5A" stroke-width="3" stroke-linecap="round"/>
+  <path d="M310 320V390" stroke="#59E1D9" stroke-width="3" stroke-linecap="round"/>
+  <path d="M890 320V390" stroke="#FF9A5A" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="600" cy="320" r="6" fill="#EEF4FB"/>
+  <circle cx="310" cy="390" r="5" fill="#59E1D9"/>
+  <circle cx="890" cy="390" r="5" fill="#FF9A5A"/>
+</svg>

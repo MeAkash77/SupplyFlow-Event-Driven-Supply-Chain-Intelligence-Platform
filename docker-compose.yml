@@ -1,0 +1,123 @@
+services:
+
+  # ── Next.js frontend ──────────────────────────────────────────────────────
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        EASYFLOW_API_URL: http://api:8000
+    container_name: easyflow-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_APP_URL: ${APP_PUBLIC_URL:-http://localhost:3000}
+      BETTER_AUTH_URL: ${APP_PUBLIC_URL:-http://localhost:3000}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-change-this-secret}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      EASYFLOW_API_URL: http://api:8000
+      NEXT_PUBLIC_EASYFLOW_API_URL: ${PUBLIC_API_URL:-http://localhost:8000}
+    depends_on:
+      api:
+        condition: service_started
+
+  # ── Message bus ───────────────────────────────────────────────────────────
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: easyflow-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"    # AMQP
+      - "15672:15672"  # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  # ── Postgres (shared instance for API + n8n tables) ───────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: easyflow-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: easyflow
+      POSTGRES_PASSWORD: easyflow
+      POSTGRES_DB: easyflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U easyflow"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # ── n8n  (open-source workflow automation + ERP connectors) ──────────────
+  #
+  #   Access at  http://localhost:5678
+  #
+  #   n8n has 400+ built-in integrations including SAP, Oracle, Dynamics 365,
+  #   NetSuite, Salesforce, Slack, and more — all free and self-hosted.
+  #
+  #   Workflow:  ERP system → n8n → POST /api/webhooks/inbound/{tenant_id}
+  #
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: easyflow-n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      # Use Postgres so workflows persist across restarts
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: postgres
+      DB_POSTGRESDB_PORT: 5432
+      DB_POSTGRESDB_DATABASE: easyflow
+      DB_POSTGRESDB_USER: easyflow
+      DB_POSTGRESDB_PASSWORD: easyflow
+      # Base URL — update this to your server IP in production
+      N8N_HOST: ${N8N_HOST:-localhost}
+      N8N_PORT: 5678
+      N8N_PROTOCOL: http
+      WEBHOOK_URL: ${N8N_PUBLIC_URL:-http://localhost:5678/}
+      # Disable telemetry for open-source use
+      N8N_DIAGNOSTICS_ENABLED: "false"
+      N8N_VERSION_NOTIFICATIONS_ENABLED: "false"
+      # Allow the EasyFlow API to be called from n8n workflows
+      N8N_BLOCK_FILE_ACCESS_TO_N8N_FILES: "false"
+      # Timezone
+      GENERIC_TIMEZONE: UTC
+    volumes:
+      - n8n_data:/home/node/.n8n
+      # Mount our workflow templates so they appear in n8n on first run
+      - ./examples/n8n-workflows:/home/node/.n8n/workflows:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ── FastAPI backend ───────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: easyflow-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+      NEON_DATABASE_URL: postgresql+asyncpg://easyflow:easyflow@postgres:5432/easyflow
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      # Secret used to validate inbound webhook signatures
+      WEBHOOK_SECRET_KEY: local-dev-webhook-secret
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+
+volumes:
+  postgres_data:
+  n8n_data:

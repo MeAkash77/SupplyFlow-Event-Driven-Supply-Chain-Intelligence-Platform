@@ -1,0 +1,66 @@
+{
+  "id": "wf-procurement-core",
+  "name": "Procurement Flow",
+  "description": "Baseline procurement workflow for restocking inventory.",
+  "tenant_id": "tenant-acme",
+  "nodes": [
+    {
+      "id": "inventory-check",
+      "name": "Inventory Check",
+      "kind": "inventory_check",
+      "config": {
+        "threshold": 25,
+        "warehouse_scope": "primary"
+      }
+    },
+    {
+      "id": "manager-approval",
+      "name": "Manager Approval",
+      "kind": "approval",
+      "config": {
+        "required_role": "warehouse_manager",
+        "timeout_hours": 24
+      }
+    },
+    {
+      "id": "supplier-allocation",
+      "name": "Supplier Allocation",
+      "kind": "supplier_assignment",
+      "config": {
+        "strategy": "best_lead_time"
+      }
+    },
+    {
+      "id": "shipment-create",
+      "name": "Shipment Creation",
+      "kind": "shipment",
+      "config": {
+        "mode": "outbound"
+      }
+    },
+    {
+      "id": "closeout",
+      "name": "Closeout",
+      "kind": "end",
+      "config": {}
+    }
+  ],
+  "edges": [
+    {
+      "source": "inventory-check",
+      "target": "manager-approval"
+    },
+    {
+      "source": "manager-approval",
+      "target": "supplier-allocation"
+    },
+    {
+      "source": "supplier-allocation",
+      "target": "shipment-create"
+    },
+    {
+      "source": "shipment-create",
+      "target": "closeout"
+    }
+  ]
+}

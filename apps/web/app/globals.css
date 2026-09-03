@@ -1,0 +1,317 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* ── Dark theme (default) ─────────────────────────────────────────────── */
+  :root {
+    --background: 214 55% 7%;
+    --foreground: 210 40% 96%;
+    --card: 217 45% 11%;
+    --card-foreground: 210 40% 96%;
+    --popover: 217 45% 11%;
+    --popover-foreground: 210 40% 96%;
+    --primary: 25 95% 63%;
+    --primary-foreground: 220 30% 10%;
+    --secondary: 184 73% 61%;
+    --secondary-foreground: 220 30% 10%;
+    --muted: 215 28% 18%;
+    --muted-foreground: 214 18% 67%;
+    --accent: 82 78% 71%;
+    --accent-foreground: 220 30% 10%;
+    --border: 214 25% 22%;
+    --input: 214 25% 22%;
+    --ring: 184 73% 61%;
+    --radius: 1.2rem;
+    --font-body: "Inter", "Avenir Next", "Segoe UI", sans-serif;
+    --font-brand: "Canela", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    --surface-1: hsl(214,55%,5%);
+    --surface-2: hsl(217,45%,8%);
+    --surface-3: hsl(217,45%,11%);
+    --text-primary: hsl(210,40%,96%);
+    --text-muted: hsl(214,18%,60%);
+    --border-subtle: rgba(255,255,255,0.08);
+    --border-normal: rgba(255,255,255,0.12);
+  }
+
+  /* ── Light theme ──────────────────────────────────────────────────────── */
+  html.light {
+    --background: 220 20% 97%;
+    --foreground: 222 30% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 30% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 30% 10%;
+    --primary: 25 95% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 184 65% 40%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 220 15% 92%;
+    --muted-foreground: 215 15% 42%;
+    --accent: 82 65% 42%;
+    --accent-foreground: 0 0% 100%;
+    --border: 220 15% 86%;
+    --input: 220 15% 88%;
+    --ring: 184 65% 40%;
+    --surface-1: hsl(220,20%,97%);
+    --surface-2: hsl(0,0%,100%);
+    --surface-3: hsl(220,15%,95%);
+    --text-primary: hsl(222,30%,10%);
+    --text-muted: hsl(215,15%,42%);
+    --border-subtle: rgba(0,0,0,0.07);
+    --border-normal: rgba(0,0,0,0.12);
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(130, 214, 225, 0.56) transparent;
+  }
+
+  body {
+    @apply min-h-screen bg-background text-foreground antialiased;
+    font-family: var(--font-body);
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    width: 12px;
+  }
+
+  html::-webkit-scrollbar-track,
+  body::-webkit-scrollbar-track {
+    background: transparent;
+    border-left: 0;
+    box-shadow: none;
+  }
+
+  html::-webkit-scrollbar-thumb,
+  body::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background:
+      linear-gradient(180deg, rgba(148, 233, 244, 0.82), rgba(89, 225, 217, 0.38)) padding-box,
+      linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.05)) border-box;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.26),
+      0 0 16px rgba(89, 225, 217, 0.16);
+    backdrop-filter: blur(10px);
+  }
+
+  html::-webkit-scrollbar-thumb:hover,
+  body::-webkit-scrollbar-thumb:hover {
+    background:
+      linear-gradient(180deg, rgba(125, 242, 236, 0.9), rgba(89, 225, 217, 0.56)) padding-box,
+      linear-gradient(180deg, rgba(255,255,255,0.24), rgba(255,255,255,0.1)) border-box;
+  }
+
+  html.light {
+    scrollbar-color: rgba(34, 211, 238, 0.58) transparent;
+  }
+
+  html.light::-webkit-scrollbar-track,
+  html.light body::-webkit-scrollbar-track {
+    background: transparent;
+    border-left: 0;
+    box-shadow: none;
+  }
+
+  html.light::-webkit-scrollbar-thumb,
+  html.light body::-webkit-scrollbar-thumb {
+    background:
+      linear-gradient(180deg, rgba(125, 242, 236, 0.8), rgba(34, 211, 238, 0.34)) padding-box,
+      linear-gradient(180deg, rgba(255,255,255,0.68), rgba(255,255,255,0.3)) border-box;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.52),
+      0 0 12px rgba(34, 211, 238, 0.12);
+  }
+
+  /* Dark body gradient */
+  html:not(.light) body {
+    background-image:
+      radial-gradient(circle at top left, rgba(89, 225, 217, 0.16), transparent 28%),
+      radial-gradient(circle at top right, rgba(255, 154, 90, 0.18), transparent 24%),
+      linear-gradient(180deg, #06111d 0%, #0a1220 100%);
+  }
+
+  /* Light body */
+  html.light body {
+    background-color: hsl(220, 20%, 97%);
+    background-image:
+      radial-gradient(circle at top left, rgba(89, 225, 217, 0.06), transparent 30%),
+      radial-gradient(circle at top right, rgba(255, 154, 90, 0.06), transparent 28%);
+  }
+
+  /* ── Light theme structural overrides ─────────────────────────────────── */
+
+  /* Sidebar */
+  html.light aside {
+    background: rgba(255,255,255,0.96) !important;
+    border-color: rgba(0,0,0,0.09) !important;
+  }
+  html.light aside .text-muted-foreground { color: hsl(215,15%,40%) !important; }
+  html.light aside .text-foreground       { color: hsl(222,30%,10%) !important; }
+  html.light aside .border-white\/10      { border-color: rgba(0,0,0,0.09) !important; }
+  html.light aside .bg-white\/5           { background-color: rgba(0,0,0,0.04) !important; }
+  html.light aside .bg-white\/10          { background-color: rgba(0,0,0,0.08) !important; }
+  html.light aside .hover\:bg-white\/5:hover  { background-color: rgba(0,0,0,0.05) !important; }
+  html.light aside .hover\:bg-white\/10:hover { background-color: rgba(0,0,0,0.08) !important; }
+  html.light aside p, html.light aside span, html.light aside div { color: inherit; }
+
+  /* Sticky headers / navbar */
+  html.light header.sticky {
+    background: rgba(255,255,255,0.88) !important;
+    border-color: rgba(0,0,0,0.09) !important;
+  }
+  html.light header .text-muted-foreground { color: hsl(215,15%,42%) !important; }
+  html.light header .border-white\/10      { border-color: rgba(0,0,0,0.09) !important; }
+  html.light header .bg-white\/5           { background-color: rgba(0,0,0,0.04) !important; }
+
+  /* Main content panels */
+  html.light .rounded-\[24px\].border,
+  html.light .rounded-\[28px\].border,
+  html.light .rounded-\[20px\].border,
+  html.light .rounded-\[18px\].border {
+    border-color: rgba(0,0,0,0.09) !important;
+    background-color: white !important;
+  }
+
+  /* Hardcoded dark backgrounds used on module cards and canvas panels */
+  html.light .bg-\[hsl\(217\,45\%\,8\%\)\] { background-color: hsl(220,20%,98%) !important; }
+  html.light .bg-white\/\[0\.02\]          { background-color: hsl(220,15%,97%) !important; }
+  html.light .bg-white\/\[0\.07\]          { background-color: hsl(220,15%,95%) !important; }
+  html.light .bg-white\/\[0\.08\]          { background-color: hsl(220,15%,94%) !important; }
+  html.light .bg-cyan-950\/40             { background-color: hsl(184,40%,94%) !important; }
+  html.light .bg-orange-950\/40           { background-color: hsl(25,50%,94%)  !important; }
+  html.light .bg-lime-950\/40             { background-color: hsl(82,40%,93%)  !important; }
+  html.light .bg-purple-950\/40           { background-color: hsl(270,40%,94%) !important; }
+  html.light .bg-yellow-950\/40           { background-color: hsl(45,40%,93%)  !important; }
+  html.light .bg-blue-950\/40             { background-color: hsl(200,40%,93%) !important; }
+  html.light .border-cyan-800\/30         { border-color: hsl(184,40%,78%)  !important; }
+  html.light .border-orange-800\/30       { border-color: hsl(25,50%,78%)   !important; }
+  html.light .border-lime-800\/30         { border-color: hsl(82,40%,76%)   !important; }
+  html.light .border-purple-800\/30       { border-color: hsl(270,40%,78%)  !important; }
+  html.light .border-yellow-800\/30       { border-color: hsl(45,40%,76%)   !important; }
+  html.light .border-blue-800\/30         { border-color: hsl(200,40%,76%)  !important; }
+  html.light .bg-white\/\[0\.03\]  { background-color: white !important; }
+  html.light .bg-white\/\[0\.04\]  { background-color: hsl(220,15%,97%) !important; }
+  html.light .bg-white\/\[0\.06\]  { background-color: hsl(220,15%,96%) !important; }
+  html.light .border-white\/10     { border-color: rgba(0,0,0,0.09) !important; }
+  html.light .border-white\/\[0\.06\] { border-color: rgba(0,0,0,0.07) !important; }
+  html.light .border-white\/\[0\.07\] { border-color: rgba(0,0,0,0.08) !important; }
+  html.light .border-white\/\[0\.08\] { border-color: rgba(0,0,0,0.09) !important; }
+
+  /* Text */
+  html.light .text-white        { color: hsl(222,30%,10%)  !important; }
+  html.light .text-white\/80    { color: hsl(222,25%,18%)  !important; }
+  html.light .text-white\/70    { color: hsl(222,22%,22%)  !important; }
+  html.light .text-white\/60    { color: hsl(215,15%,38%)  !important; }
+  html.light .text-white\/50    { color: hsl(215,12%,45%)  !important; }
+  html.light .text-white\/40    { color: hsl(215,10%,52%)  !important; }
+  html.light .text-white\/35    { color: hsl(215,10%,54%)  !important; }
+  html.light .text-white\/30    { color: hsl(215,10%,58%)  !important; }
+  html.light .text-white\/25    { color: hsl(215,8%,62%)   !important; }
+  html.light .text-white\/20    { color: hsl(215,8%,68%)   !important; }
+
+  /* Slate backgrounds */
+  html.light .bg-slate-950\/70  { background-color: rgba(255,255,255,0.88) !important; }
+  html.light .bg-slate-950\/80  { background-color: rgba(255,255,255,0.92) !important; }
+  html.light .bg-slate-950\/82  { background-color: rgba(255,255,255,0.94) !important; }
+  html.light .bg-slate-950\/85  { background-color: rgba(255,255,255,0.95) !important; }
+  html.light .bg-slate-950\/90  { background-color: rgba(255,255,255,0.96) !important; }
+  html.light .bg-slate-950      { background-color: #ffffff !important; }
+  html.light .bg-slate-900\/80  { background-color: rgba(248,250,252,0.9) !important; }
+  html.light .bg-slate-900\/90  { background-color: rgba(248,250,252,0.95) !important; }
+  html.light .bg-slate-900      { background-color: hsl(220,15%,96%) !important; }
+
+  /* Dividers inside tables */
+  html.light .divide-white\/\[0\.04\] > * + * { border-color: rgba(0,0,0,0.06) !important; }
+
+  /* Inputs / selects inside forms */
+  html.light input, html.light select, html.light textarea {
+    background-color: hsl(220,15%,96%) !important;
+    border-color: rgba(0,0,0,0.12) !important;
+    color: hsl(222,30%,10%) !important;
+  }
+  html.light input::placeholder,
+  html.light textarea::placeholder { color: hsl(215,12%,55%) !important; }
+}
+
+@layer utilities {
+  @keyframes pitchBeam {
+    0% {
+      transform: translate3d(-4%, -2%, 0) rotate(32deg);
+      opacity: 0.34;
+    }
+    50% {
+      transform: translate3d(4%, 3%, 0) rotate(32deg);
+      opacity: 0.52;
+    }
+    100% {
+      transform: translate3d(-4%, -2%, 0) rotate(32deg);
+      opacity: 0.34;
+    }
+  }
+
+  .glass-panel {
+    @apply border border-white/10 bg-slate-950/40 backdrop-blur-xl;
+  }
+
+  .page-shell {
+    @apply grid min-h-screen md:grid-cols-[280px_1fr];
+  }
+
+  .grid-sheen {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 36px 36px;
+  }
+
+  .brand-wordmark {
+    font-family: var(--font-brand);
+    font-weight: 600;
+    letter-spacing: -0.05em;
+    line-height: 0.96;
+  }
+
+  .brand-wordmark span:last-child {
+    color: hsl(var(--secondary));
+    font-style: italic;
+  }
+
+  .flow-beam {
+    background:
+      radial-gradient(circle at top, rgba(89, 225, 217, 0.38), transparent 22%),
+      linear-gradient(180deg, rgba(89, 225, 217, 0.24), rgba(255, 154, 90, 0.12));
+  }
+
+  .process-canvas {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      radial-gradient(circle at 25% 15%, rgba(89, 225, 217, 0.12), transparent 28%),
+      radial-gradient(circle at 80% 85%, rgba(255, 154, 90, 0.1), transparent 24%);
+    background-size: 32px 32px, 32px 32px, auto, auto;
+  }
+
+  .process-node {
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.24);
+  }
+
+  .drag-handle {
+    touch-action: none;
+  }
+}

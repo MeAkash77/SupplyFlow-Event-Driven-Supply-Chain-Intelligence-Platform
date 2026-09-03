@@ -1,0 +1,506 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("PRISMA_DATABASE_URL")
+}
+
+// ─── App models ───────────────────────────────────────────────────────────────
+
+model Tenant {
+  id               String             @id @db.VarChar(64)
+  name             String             @db.VarChar(128)
+  slug             String             @unique @db.VarChar(128)
+  industry         String             @db.VarChar(128)
+  headquarters     String             @db.VarChar(128)
+  mode             String             @default("") @db.VarChar(128)
+  primaryRegion    String             @map("primary_region") @db.VarChar(128)
+  warehouseCount   Int                @map("warehouse_count")
+  supplierCount    Int                @map("supplier_count")
+  monthlyOrders    Int                @map("monthly_orders")
+  flagshipWorkflow String             @map("flagship_workflow") @db.VarChar(128)
+  dbUrl            String             @default("") @map("db_url") @db.VarChar(256)
+  appUsers         AppUser[]
+  workflows        WorkflowRegistry[]
+  connectors       TenantConnector[]
+  assistantThreads AssistantThread[]
+  assistantMessages AssistantMessage[]
+  assistantDocuments AssistantDocument[]
+  assistantActionTasks AssistantActionTask[]
+  assistantActionActivities AssistantActionActivity[]
+  orders           TenantOrder[]
+  products         TenantProduct[]
+  shipments        TenantShipment[]
+  suppliers        TenantSupplier[]
+  purchaseOrders   TenantPurchaseOrder[]
+  approvals        TenantApproval[]
+  automationRules  TenantAutomationRule[]
+  salesContacts    SalesContact[]
+  salesLeads       SalesLead[]
+  salesDeals       SalesDeal[]
+  salesActivities  SalesActivity[]
+
+  @@map("tenants")
+}
+
+model AppUser {
+  id          String  @id @db.VarChar(64)
+  email       String  @unique @db.VarChar(128)
+  role        String  @db.VarChar(32)
+  tenantId    String? @map("tenant_id") @db.VarChar(64)
+  displayName String  @map("display_name") @db.VarChar(128)
+  tenant      Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  assistantThreads AssistantThread[]
+
+  @@index([tenantId])
+  @@map("app_users")
+}
+
+model WorkflowRegistry {
+  id          String @id @db.VarChar(64)
+  tenantId    String @map("tenant_id") @db.VarChar(64)
+  name        String @db.VarChar(128)
+  description String
+  createdBy   String @map("created_by") @db.VarChar(64)
+  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("workflow_registry")
+}
+
+model TenantConnector {
+  id            Int    @id @default(autoincrement())
+  tenantId      String @map("tenant_id") @db.VarChar(64)
+  connectorType String @map("connector_type") @db.VarChar(64)
+  config        Json
+  createdBy     String @map("created_by") @db.VarChar(64)
+  tenant        Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("tenant_connectors")
+}
+
+model AssistantThread {
+  id              String             @id @default(cuid()) @db.VarChar(64)
+  tenantId        String             @map("tenant_id") @db.VarChar(64)
+  createdByUserId String?            @map("created_by_user_id") @db.VarChar(64)
+  title           String             @db.VarChar(160)
+  status          String             @default("active") @db.VarChar(32)
+  source          String             @default("tenant_copilot") @db.VarChar(64)
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @updatedAt @map("updated_at")
+  tenant          Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdByUser   AppUser?           @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
+  messages        AssistantMessage[]
+  actionTasks     AssistantActionTask[]
+  actionActivities AssistantActionActivity[]
+
+  @@index([tenantId, updatedAt])
+  @@map("assistant_threads")
+}
+
+model AssistantMessage {
+  id        String          @id @default(cuid()) @db.VarChar(64)
+  threadId  String          @map("thread_id") @db.VarChar(64)
+  tenantId  String          @map("tenant_id") @db.VarChar(64)
+  role      String          @db.VarChar(16)
+  content   String
+  citations Json?
+  metadata  Json?
+  createdAt DateTime        @default(now()) @map("created_at")
+  thread    AssistantThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  tenant    Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([threadId, createdAt])
+  @@index([tenantId, createdAt])
+  @@map("assistant_messages")
+}
+
+model AssistantDocument {
+  id             String   @id @default(cuid()) @db.VarChar(64)
+  tenantId       String   @map("tenant_id") @db.VarChar(64)
+  sourceType     String   @map("source_type") @db.VarChar(64)
+  sourceId       String?  @map("source_id") @db.VarChar(128)
+  title          String   @db.VarChar(160)
+  content        String
+  searchText     String   @map("search_text")
+  keywords       Json?
+  metadata       Json?
+  embeddingModel String?  @map("embedding_model") @db.VarChar(128)
+  embeddingRef   String?  @map("embedding_ref") @db.VarChar(256)
+  fingerprint    String   @unique @db.VarChar(160)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, sourceType])
+  @@index([tenantId, updatedAt])
+  @@map("assistant_documents")
+}
+
+model AssistantActionTask {
+  id                   String           @id @default(cuid()) @db.VarChar(64)
+  tenantId             String           @map("tenant_id") @db.VarChar(64)
+  threadId             String?          @map("thread_id") @db.VarChar(64)
+  actionId             String           @map("action_id") @db.VarChar(128)
+  actionType           String           @map("action_type") @db.VarChar(64)
+  title                String           @db.VarChar(160)
+  detail               String
+  targetType           String           @map("target_type") @db.VarChar(64)
+  targetId             String           @map("target_id") @db.VarChar(128)
+  status               String           @default("confirmed") @db.VarChar(32)
+  requiresConfirmation Boolean          @default(true) @map("requires_confirmation")
+  confirmedAt          DateTime         @default(now()) @map("confirmed_at")
+  completedAt          DateTime?        @map("completed_at")
+  metadata             Json?
+  tenant               Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  thread               AssistantThread? @relation(fields: [threadId], references: [id], onDelete: SetNull)
+  activities           AssistantActionActivity[]
+
+  @@index([tenantId, confirmedAt])
+  @@index([tenantId, status])
+  @@map("assistant_action_tasks")
+}
+
+model AssistantActionActivity {
+  id        String              @id @default(cuid()) @db.VarChar(64)
+  tenantId  String              @map("tenant_id") @db.VarChar(64)
+  threadId  String?             @map("thread_id") @db.VarChar(64)
+  taskId    String?             @map("task_id") @db.VarChar(64)
+  kind      String              @db.VarChar(64)
+  title     String              @db.VarChar(160)
+  detail    String
+  metadata  Json?
+  createdAt DateTime            @default(now()) @map("created_at")
+  tenant    Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  thread    AssistantThread?    @relation(fields: [threadId], references: [id], onDelete: SetNull)
+  task      AssistantActionTask? @relation(fields: [taskId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, kind])
+  @@map("assistant_action_activities")
+}
+
+model AutomationEvent {
+  id           String                @id @default(cuid()) @db.VarChar(64)
+  tenantSlug   String                @map("tenant_slug") @db.VarChar(128)
+  eventType    String                @map("event_type") @db.VarChar(64)
+  sourceSystem String                @map("source_system") @db.VarChar(64)
+  title        String                @db.VarChar(160)
+  summary      String
+  status       String                @default("processed") @db.VarChar(32)
+  payload      Json?
+  createdAt    DateTime              @default(now()) @map("created_at")
+  executions   AutomationExecution[]
+
+  @@index([tenantSlug, createdAt])
+  @@index([tenantSlug, eventType])
+  @@map("automation_events")
+}
+
+model AutomationExecution {
+  id          String          @id @default(cuid()) @db.VarChar(64)
+  tenantSlug  String          @map("tenant_slug") @db.VarChar(128)
+  eventId     String          @map("event_id") @db.VarChar(64)
+  ruleId      String          @map("rule_id") @db.VarChar(64)
+  ruleName    String          @map("rule_name") @db.VarChar(160)
+  actionLabel String          @map("action_label") @db.VarChar(160)
+  outcome     String          @db.VarChar(32)
+  detail      String
+  metadata    Json?
+  createdAt   DateTime        @default(now()) @map("created_at")
+  event       AutomationEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([tenantSlug, createdAt])
+  @@index([tenantSlug, ruleId])
+  @@map("automation_executions")
+}
+
+// ─── Supply chain operational data (seeded from DataCo dataset) ──────────────
+
+model TenantOrder {
+  id            Int      @id @default(autoincrement())
+  tenantId      String   @map("tenant_id") @db.VarChar(64)
+  orderId       String   @map("order_id") @db.VarChar(64)
+  customer      String   @db.VarChar(128)
+  city          String   @db.VarChar(64)
+  country       String   @db.VarChar(64)
+  segment       String   @db.VarChar(64)
+  value         Float
+  items         Int
+  orderDate     DateTime @map("order_date")
+  shippingDate  DateTime? @map("shipping_date")
+  status        String   @db.VarChar(64)
+  shippingMode  String   @map("shipping_mode") @db.VarChar(64)
+  lateRisk      Boolean  @default(false) @map("late_risk")
+  daysScheduled Int      @map("days_scheduled")
+  daysReal      Int?     @map("days_real")
+  warehouse     String   @db.VarChar(64)
+  carrier       String   @db.VarChar(64)
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([tenantId, orderDate])
+  @@map("tenant_orders")
+}
+
+model TenantProduct {
+  id           Int    @id @default(autoincrement())
+  tenantId     String @map("tenant_id") @db.VarChar(64)
+  productId    String @map("product_id") @db.VarChar(64)
+  name         String @db.VarChar(256)
+  category     String @db.VarChar(128)
+  department   String @db.VarChar(128)
+  price        Float
+  stock        Int    @default(0)
+  reorderPoint Int    @default(100) @map("reorder_point")
+  velocity     Int    @default(0)
+  supplier     String @db.VarChar(128)
+  status       String @db.VarChar(32)
+  tenant       Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("tenant_products")
+}
+
+model TenantShipment {
+  id          Int      @id @default(autoincrement())
+  tenantId    String   @map("tenant_id") @db.VarChar(64)
+  shipmentId  String   @map("shipment_id") @db.VarChar(64)
+  tracking    String   @db.VarChar(64)
+  origin      String   @db.VarChar(128)
+  destination String   @db.VarChar(128)
+  carrier     String   @db.VarChar(64)
+  items       Int
+  value       Float
+  dispatched  DateTime
+  eta         DateTime
+  status      String   @db.VarChar(64)
+  shippingMode String  @map("shipping_mode") @db.VarChar(64)
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("tenant_shipments")
+}
+
+model TenantSupplier {
+  id           Int    @id @default(autoincrement())
+  tenantId     String @map("tenant_id") @db.VarChar(64)
+  name         String @db.VarChar(128)
+  category     String @db.VarChar(64)
+  country      String @db.VarChar(64)
+  fillRate     Float  @map("fill_rate")
+  leadTimeDays Float  @map("lead_time_days")
+  qualityScore Int    @map("quality_score")
+  spendMtd     Float  @map("spend_mtd")
+  riskLevel    String @map("risk_level") @db.VarChar(32)
+  since        Int
+  tenant       Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("tenant_suppliers")
+}
+
+model TenantPurchaseOrder {
+  id         Int      @id @default(autoincrement())
+  tenantId   String   @map("tenant_id") @db.VarChar(64)
+  poId       String   @map("po_id") @db.VarChar(64)
+  supplier   String   @db.VarChar(128)
+  category   String   @db.VarChar(64)
+  value      Float
+  items      Int
+  raised     DateTime
+  due        DateTime
+  status     String   @db.VarChar(32)
+  tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("tenant_purchase_orders")
+}
+
+model TenantApproval {
+  id           Int    @id @default(autoincrement())
+  tenantId     String @map("tenant_id") @db.VarChar(64)
+  reqId        String @map("req_id") @db.VarChar(64)
+  requestor    String @db.VarChar(64)
+  dept         String @db.VarChar(64)
+  amount       Float
+  priority     String @db.VarChar(16)
+  waitingHours Float  @map("waiting_hours")
+  approver     String @db.VarChar(64)
+  tenant       Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("tenant_approvals")
+}
+
+model TenantAutomationRule {
+  id              Int    @id @default(autoincrement())
+  tenantId        String @map("tenant_id") @db.VarChar(64)
+  ruleId          String @map("rule_id") @db.VarChar(64)
+  name            String @db.VarChar(128)
+  trigger         String @db.VarChar(128)
+  action          String @db.VarChar(128)
+  status          String @db.VarChar(16)
+  lastRunHoursAgo Float? @map("last_run_hours_ago")
+  totalRuns       Int    @default(0) @map("total_runs")
+  tenant          Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("tenant_automation_rules")
+}
+
+// ─── Sales CRM ───────────────────────────────────────────────────────────────
+
+model SalesContact {
+  id         String       @id @default(cuid()) @db.VarChar(64)
+  tenantId   String       @map("tenant_id") @db.VarChar(64)
+  name       String       @db.VarChar(128)
+  email      String       @db.VarChar(128)
+  company    String       @db.VarChar(128)
+  title      String       @db.VarChar(128)
+  phone      String?      @db.VarChar(32)
+  country    String       @db.VarChar(64)
+  source     String       @default("manual") @db.VarChar(32)
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+  tenant     Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  leads      SalesLead[]
+  activities SalesActivity[]
+
+  @@index([tenantId])
+  @@map("sales_contacts")
+}
+
+model SalesLead {
+  id          String       @id @default(cuid()) @db.VarChar(64)
+  tenantId    String       @map("tenant_id") @db.VarChar(64)
+  contactId   String?      @map("contact_id") @db.VarChar(64)
+  title       String       @db.VarChar(160)
+  company     String       @db.VarChar(128)
+  value       Float        @default(0)
+  stage       String       @default("prospect") @db.VarChar(32)
+  score       Int          @default(0)
+  priority    String       @default("medium") @db.VarChar(16)
+  source      String       @default("inbound") @db.VarChar(32)
+  owner       String       @db.VarChar(64)
+  nextAction  String?      @map("next_action") @db.VarChar(256)
+  closedAt    DateTime?    @map("closed_at")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  tenant      Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  contact     SalesContact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  activities  SalesActivity[]
+
+  @@index([tenantId, stage])
+  @@index([tenantId, createdAt])
+  @@map("sales_leads")
+}
+
+model SalesDeal {
+  id         String       @id @default(cuid()) @db.VarChar(64)
+  tenantId   String       @map("tenant_id") @db.VarChar(64)
+  title      String       @db.VarChar(160)
+  company    String       @db.VarChar(128)
+  value      Float
+  stage      String       @db.VarChar(32)
+  probability Int         @default(50)
+  owner      String       @db.VarChar(64)
+  closeDate  DateTime?    @map("close_date")
+  wonAt      DateTime?    @map("won_at")
+  lostAt     DateTime?    @map("lost_at")
+  lostReason String?      @map("lost_reason") @db.VarChar(256)
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+  tenant     Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  activities SalesActivity[]
+
+  @@index([tenantId, stage])
+  @@index([tenantId, createdAt])
+  @@map("sales_deals")
+}
+
+model SalesActivity {
+  id        String        @id @default(cuid()) @db.VarChar(64)
+  tenantId  String        @map("tenant_id") @db.VarChar(64)
+  leadId    String?       @map("lead_id") @db.VarChar(64)
+  dealId    String?       @map("deal_id") @db.VarChar(64)
+  contactId String?       @map("contact_id") @db.VarChar(64)
+  type      String        @db.VarChar(32)
+  subject   String        @db.VarChar(256)
+  body      String?
+  outcome   String?       @db.VarChar(64)
+  dueAt     DateTime?     @map("due_at")
+  doneAt    DateTime?     @map("done_at")
+  createdAt DateTime      @default(now()) @map("created_at")
+  tenant    Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  lead      SalesLead?    @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  deal      SalesDeal?    @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  contact   SalesContact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, leadId])
+  @@map("sales_activities")
+}
+
+// ─── Better-Auth models ───────────────────────────────────────────────────────
+
+model User {
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
+  sessions      Session[]
+  accounts      Account[]
+
+  @@map("auth_users")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("auth_sessions")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("auth_accounts")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("auth_verifications")
+}

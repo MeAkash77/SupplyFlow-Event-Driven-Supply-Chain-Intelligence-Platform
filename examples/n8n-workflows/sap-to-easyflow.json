@@ -1,0 +1,114 @@
+{
+  "name": "SAP S/4HANA → EasyFlow",
+  "description": "Fetches purchase orders from SAP OData API and forwards them to EasyFlow via webhook. Runs every 5 minutes.",
+  "tags": ["easyflow", "sap", "erp", "supply-chain"],
+  "nodes": [
+    {
+      "id": "trigger",
+      "name": "Every 5 minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "rule": { "interval": [{ "field": "minutes", "minutesInterval": 5 }] }
+      },
+      "position": [100, 300]
+    },
+    {
+      "id": "sap_fetch",
+      "name": "Fetch SAP Purchase Orders",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.SAP_BASE_URL }}/sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV/A_PurchaseOrder",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "basicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Accept", "value": "application/json" },
+            { "name": "sap-client", "value": "={{ $env.SAP_CLIENT }}" }
+          ]
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "$filter", "value": "PurchaseOrderStatus ne 'L'" },
+            { "name": "$top", "value": "100" },
+            { "name": "$format", "value": "json" }
+          ]
+        }
+      },
+      "position": [350, 300]
+    },
+    {
+      "id": "split",
+      "name": "Split into items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "parameters": { "batchSize": 1 },
+      "position": [600, 300]
+    },
+    {
+      "id": "transform",
+      "name": "Normalise to EasyFlow format",
+      "type": "n8n-nodes-base.set",
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "fields": {
+          "values": [
+            { "name": "event_type",         "value": "purchase_order_created" },
+            { "name": "source",             "value": "sap" },
+            { "name": "tenant_id",          "value": "={{ $env.EASYFLOW_TENANT_ID }}" },
+            { "name": "data.purchase_order_id", "value": "={{ $json.PurchaseOrder }}" },
+            { "name": "data.supplier_name", "value": "={{ $json.Supplier }}" },
+            { "name": "data.quantity",      "value": "={{ $json.OrderQuantity }}" },
+            { "name": "data.currency",      "value": "={{ $json.DocumentCurrency }}" },
+            { "name": "data.status",        "value": "={{ $json.PurchaseOrderStatus }}" },
+            { "name": "data.created_date",  "value": "={{ $json.CreationDate }}" }
+          ]
+        }
+      },
+      "position": [850, 300]
+    },
+    {
+      "id": "send_to_easyflow",
+      "name": "POST to EasyFlow Webhook",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.EASYFLOW_API_URL }}/api/webhooks/inbound/{{ $env.EASYFLOW_TENANT_ID }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type",      "value": "application/json" },
+            { "name": "X-Source",          "value": "sap" },
+            { "name": "X-Webhook-Token",   "value": "={{ $env.EASYFLOW_WEBHOOK_TOKEN }}" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "event_type",  "value": "={{ $json.event_type }}" },
+            { "name": "source",      "value": "={{ $json.source }}" },
+            { "name": "tenant_id",   "value": "={{ $json.tenant_id }}" },
+            { "name": "data",        "value": "={{ $json.data }}" }
+          ]
+        }
+      },
+      "position": [1100, 300]
+    }
+  ],
+  "connections": {
+    "trigger":     { "main": [[{ "node": "sap_fetch",   "type": "main", "index": 0 }]] },
+    "sap_fetch":   { "main": [[{ "node": "split",       "type": "main", "index": 0 }]] },
+    "split":       { "main": [[{ "node": "transform",   "type": "main", "index": 0 }]] },
+    "transform":   { "main": [[{ "node": "send_to_easyflow", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "env_vars_needed": {
+    "SAP_BASE_URL":             "https://your-sap-host.example.com",
+    "SAP_CLIENT":               "100",
+    "EASYFLOW_API_URL":         "http://localhost:8000",
+    "EASYFLOW_TENANT_ID":       "acme-retail",
+    "EASYFLOW_WEBHOOK_TOKEN":   "get-from-easyflow-integrations-page"
+  }
+}

@@ -1,0 +1,76 @@
+import { cn } from "@/lib/utils";
+
+type LogoMarkProps = {
+  className?: string;
+};
+
+export function LogoMark({ className }: LogoMarkProps) {
+  return (
+    <svg
+      viewBox="0 0 256 256"
+      aria-hidden="true"
+      className={cn("h-full w-full", className)}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M46 160C75 148 101 149 126 164C153 180 181 184 210 175C194 188 175 195 152 196C123 197 95 188 70 170C62 165 54 162 46 160Z"
+        fill="url(#easyflow-mark-a)"
+      />
+      <path
+        d="M74 163C61 135 67 103 90 80C112 58 143 50 175 58C156 58 137 64 121 76C101 91 90 113 89 138C88 149 83 158 74 163Z"
+        fill="url(#easyflow-mark-a)"
+      />
+      <path
+        d="M94 170C84 149 86 123 101 102C116 82 138 71 163 71C150 75 138 82 129 93C116 108 111 128 113 149C114 158 108 166 94 170Z"
+        fill="#0C41C2"
+        fillOpacity=".9"
+      />
+      <path
+        d="M74 160C73 131 82 107 100 87C121 63 148 51 181 52C162 60 146 71 133 86C118 103 110 123 110 145C110 153 99 160 74 160Z"
+        fill="url(#easyflow-mark-b)"
+        fillOpacity=".92"
+      />
+      <path
+        d="M142 82C159 81 175 86 187 97C198 107 203 120 201 136C197 126 190 119 180 115C170 111 160 110 149 112C159 102 164 92 162 82H142Z"
+        fill="#0B5CE8"
+      />
+      <circle cx="52" cy="123" r="7" fill="#24A2FF" />
+      <circle cx="44" cy="138" r="4.5" fill="#3FB6FF" />
+      <circle cx="58" cy="135" r="5.5" fill="#168CFF" />
+      <path
+        d="M57 163C57 154 62 147 70 147C78 147 84 154 84 163C84 170 78 176 70 176C62 176 57 170 57 163Z"
+        fill="#39B6FF"
+      />
+      <path
+        d="M50 177C50 173 53 170 58 170C63 170 67 173 67 177C67 181 63 184 58 184C53 184 50 181 50 177Z"
+        fill="#1793FF"
+      />
+      <defs>
+        <linearGradient
+          id="easyflow-mark-a"
+          x1="44"
+          y1="176"
+          x2="214"
+          y2="58"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop offset="0" stopColor="#0A46D0" />
+          <stop offset=".42" stopColor="#168CFF" />
+          <stop offset="1" stopColor="#8ED6FF" />
+        </linearGradient>
+        <linearGradient
+          id="easyflow-mark-b"
+          x1="62"
+          y1="170"
+          x2="194"
+          y2="80"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop offset="0" stopColor="#D9F3FF" />
+          <stop offset="1" stopColor="#FFFFFF" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
