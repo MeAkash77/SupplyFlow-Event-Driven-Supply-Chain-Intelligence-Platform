@@ -381,7 +381,7 @@ Optional local stack:
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/achyutuni2001/EasyFlow.git
+git clone https://github.com/MeAkash77/SupplyFlow-Event-Driven-Supply-Chain-Intelligence-Platform.git
 cd EasyFlow
 ```
 
