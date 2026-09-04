@@ -1,6 +1,6 @@
-# EasyFlow
+# SupplyFlow
 
-EasyFlow is an open-source, multi-tenant operational coordination layer for supply chain teams.
+SupplyFlow is an open-source, multi-tenant operational coordination layer for supply chain teams.
 
 It sits above ERP, warehouse, logistics, supplier, and planning systems and turns raw operational data into:
 
@@ -10,11 +10,11 @@ It sits above ERP, warehouse, logistics, supplier, and planning systems and turn
 - automation and event handling
 - AI-assisted explanations through FlowGuide
 
-EasyFlow is not trying to replace SAP, Oracle, Dynamics, NetSuite, Infor, or warehouse software. The goal is to make the operational work around those systems easier to see, understand, and act on.
+SupplyFlow is not trying to replace SAP, Oracle, Dynamics, NetSuite, Infor, or warehouse software. The goal is to make the operational work around those systems easier to see, understand, and act on.
 
-## What EasyFlow does
+## What SupplyFlow does
 
-EasyFlow helps teams answer questions like:
+SupplyFlow helps teams answer questions like:
 
 - What is delayed right now?
 - Which approvals are still pending?
@@ -696,12 +696,12 @@ Recommended first steps after forking:
 
 ## Summary
 
-EasyFlow is a visual operational layer on top of raw enterprise supply chain data.
+SupplyFlow is a visual operational layer on top of raw enterprise supply chain data.
 
 It combines:
 
 - tenant-isolated workspaces
-- workflow execution and coordination
+- SupplyFlow execution and coordination
 - operational visibility
 - risk intelligence
 - AI-assisted explanation
