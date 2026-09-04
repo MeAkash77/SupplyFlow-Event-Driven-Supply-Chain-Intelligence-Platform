@@ -1,4 +1,3 @@
-```python
 from __future__ import annotations
 
 from sqlalchemy.ext.asyncio import (
@@ -20,17 +19,15 @@ _tenant_sessionmakers: dict[str, sessionmaker[AsyncSession]] = {}
 
 def _async_database_url(url: str) -> str:
     """
-    Convert a PostgreSQL connection URL to an asyncpg-compatible
-    SQLAlchemy URL.
+    Convert a PostgreSQL URL to an asyncpg-compatible SQLAlchemy URL.
 
     asyncpg does not accept libpq-style parameters such as:
-        - sslmode
-        - channel_binding
+    - sslmode
+    - channel_binding
 
-    SSL is configured separately through connect_args.
+    SSL is configured separately using connect_args.
     """
 
-    # Convert standard PostgreSQL URLs to SQLAlchemy asyncpg URLs.
     if url.startswith("postgresql://"):
         url = url.replace(
             "postgresql://",
@@ -44,7 +41,6 @@ def _async_database_url(url: str) -> str:
             1,
         )
 
-    # Remove parameters that are not supported by asyncpg.
     if "?" in url:
         base, query = url.split("?", 1)
 
@@ -209,4 +205,4 @@ def database_summary(
         "provider": "sqlalchemy",
         "dsn_hint": settings.neon_database_url,
     }
-```
+
