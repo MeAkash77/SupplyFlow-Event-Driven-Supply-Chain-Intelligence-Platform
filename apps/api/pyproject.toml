@@ -11,7 +11,9 @@ dependencies = [
   "fastapi>=0.115.0",
   "pydantic-settings>=2.6.1",
   "sqlalchemy>=2.0.36",
-  "uvicorn>=0.30.0"
+  "uvicorn>=0.30.0",
+  "aiohttp>=3.14.3",
+  "psycopg2-binary>=2.9.12",
 ]
 
 [tool.uvicorn]
